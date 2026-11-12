@@ -1,0 +1,116 @@
+name: Build personal Mac app
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - codex/chatgpt-login
+
+permissions:
+  contents: read
+
+concurrency:
+  group: personal-mac-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  mac-arm64:
+    name: Apple Silicon / personal dev build
+    runs-on: macos-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    env:
+      OPENCODE_CHANNEL: dev
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+    steps:
+      - name: Check out the selected branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+
+      - name: Verify Apple Silicon runner and activate pinned pnpm
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = arm64
+          corepack enable
+          corepack prepare pnpm@11.23.0 --activate
+          test "$(pnpm --version)" = 11.23.0
+
+      - name: Install frozen dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check types, lint and tests
+        run: |
+          set -euo pipefail
+          pnpm typecheck
+          pnpm lint:ci
+          pnpm test
+
+      - name: Prepare bundled tools and Python
+        working-directory: packages/desktop-electron
+        run: |
+          set -euo pipefail
+          pnpm exec tsx scripts/prepare-uv.ts --platform darwin --arch arm64
+          pnpm exec tsx scripts/prepare-primary-runtime.ts --platform darwin --arch arm64
+
+      - name: Build desktop
+        run: pnpm --filter @pawwork/desktop build
+
+      - name: Package personal app without publication or Apple notarization
+        working-directory: packages/desktop-electron
+        run: >-
+          pnpm exec electron-builder --mac dmg zip --arm64 --publish never
+          --config electron-builder.config.ts --config.mac.identity=-
+          --config.mac.notarize=false --config.dmg.sign=false
+
+      - name: Record artifact checksums
+        working-directory: packages/desktop-electron/dist
+        run: |
+          set -euo pipefail
+          shasum -a 256 *.dmg *.zip > SHA256SUMS.txt
+
+      - name: Upload personal installer
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.0
+        with:
+          name: pawwork-personal-mac-arm64-${{ github.run_id }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            packages/desktop-electron/dist/*.dmg
+            packages/desktop-electron/dist/*.zip
+            packages/desktop-electron/dist/SHA256SUMS.txt
+
+      - name: Publish the personal installer as a prerelease
+        working-directory: packages/desktop-electron/dist
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: chatgpt-mac-arm64-${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          notes_file="$RUNNER_TEMP/pawwork-personal-release.md"
+          cat > "$notes_file" <<EOF
+          Personal Apple Silicon Mac build with ChatGPT / Codex sign-in.
+
+          Source commit: $GITHUB_SHA
+
+          Open the DMG and drag PawWork Dev.app into Applications. This dev build
+          is ad-hoc signed and is not Apple notarized. It uses a separate dev profile
+          and does not auto-update from the upstream application.
+
+          Account authorization and model access must be verified by the user.
+          EOF
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" *.dmg *.zip SHA256SUMS.txt --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$RELEASE_TAG" *.dmg *.zip SHA256SUMS.txt \
+              --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+              --title "PawWork ChatGPT · Apple Silicon · $GITHUB_RUN_NUMBER" \
+              --notes-file "$notes_file"
+          fi
+          echo "Download: https://github.com/$GITHUB_REPOSITORY/releases/tag/$RELEASE_TAG" >> "$GITHUB_STEP_SUMMARY"

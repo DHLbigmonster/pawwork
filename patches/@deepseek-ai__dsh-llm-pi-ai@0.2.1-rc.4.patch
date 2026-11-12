@@ -1,8 +1,7 @@
 diff --git a/lib/index.js b/lib/index.js
-index 4b1e5ad..84bdc59 100644
 --- a/lib/index.js
 +++ b/lib/index.js
-@@ -418,7 +418,8 @@ const COMPLETIONS_COMPAT_GATE = {
+@@ -418,7 +418,8 @@
  	vercelGatewayRouting: "withhold",
  	zaiToolStream: "withhold",
  	supportsOpenAIGrammarTools: "withhold",
@@ -12,7 +11,7 @@ index 4b1e5ad..84bdc59 100644
  	supportsMidConvoSystemMessages: "withhold",
  	supportsMidConvoToolAdditions: "withhold",
  	sessionAffinityFormat: "withhold"
-@@ -655,6 +656,10 @@ function resolveModelCompat(provider, entry, route, base, api) {
+@@ -655,6 +656,10 @@
  */
  function resolveRouteModels(request, validation = "strict") {
  	const { provider } = request;
@@ -23,7 +22,7 @@ index 4b1e5ad..84bdc59 100644
  	const defaults = catalogModels(provider);
  	const providerBaseUrl = catalogProvider(provider)?.baseUrl;
  	const configured = request.models ?? [];
-@@ -1871,7 +1876,12 @@ var PiAiAdapter = class extends LlmAdapter {
+@@ -1871,7 +1876,12 @@
  		const profile = this.profileOf(snapshot, provider);
  		const failure = profile.modelErrors.get(model) ?? (profile.piProvider === void 0 ? profile.catalogError : void 0);
  		if (failure !== void 0) throw new LlmError(failure, "INVALID_CONFIG");
@@ -37,13 +36,29 @@ index 4b1e5ad..84bdc59 100644
  		if (resolved === void 0) throw new LlmError(`pi-ai provider "${provider}" has no configured model "${model}"`, "UNKNOWN_MODEL");
  		return resolved;
  	}
-@@ -2852,7 +2862,8 @@ function directoryEntries(profiles, settingsNs) {
+@@ -2154,10 +2164,14 @@
+ 			}
+ 			return mine;
+ 		},
+-		async modify(providerId, mutate) {
++		async modify(providerId, mutate, options) {
+ 			if (!isCredentialKeySegment(providerId)) throw new LlmError(`llm-pi-ai: provider id "${providerId}" cannot address a stored credential record (a record id is a lowercase hyphenated identifier); authenticate this route through apiKeyEnv instead of a stored credential`, "UNSTORABLE_PROVIDER_ID");
++			options?.signal?.throwIfAborted();
+ 			return toPiCredential(await writableStore(ctx).modifyRecord(recordKeyFor(providerId), async (current) => {
++				// A cancelled login may have waited behind another credential writer.
++				options?.signal?.throwIfAborted();
+ 				const next = await mutate(toPiCredential(current));
++				options?.signal?.throwIfAborted();
+ 				return next === void 0 ? void 0 : toRecord(next);
+ 			}));
+ 		},
+@@ -2852,7 +2866,8 @@
  			...error === void 0 ? {} : { error }
  		});
  	};
 -	for (const provider of catalogProviderIds()) declare(provider, provider);
-+	// PawWork has no sign-in surface for OAuth-only catalog providers.
-+	for (const provider of catalogProviderIds()) if (catalogProvider(provider)?.auth?.apiKey !== void 0) declare(provider, provider);
++	// PawWork supplies a sign-in surface for the Codex subscription route.
++	for (const provider of catalogProviderIds()) if (provider === "openai-codex" || catalogProvider(provider)?.auth?.apiKey !== void 0) declare(provider, provider);
  	for (const [provider, profile] of profiles) declare(provider, profile.displayName, profile.catalogError);
  	return [...entries.values()];
  }

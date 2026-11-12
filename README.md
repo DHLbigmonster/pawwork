@@ -81,13 +81,21 @@ Automations run a saved task on a cron schedule — a Monday morning digest of a
 
 ## Models and Search
 
-PawWork ships no model credential. On first launch it asks you to choose a provider and paste an API key, which is stored locally and can be changed in settings at any time. Any provider the DSH model adapter supports will work.
+PawWork ships no model credential. On first launch you can authorize a ChatGPT account or add a provider's API key. Grants and keys are stored locally and can be changed in settings at any time. Any provider the DSH model adapter supports will work.
 
 Web search is built in and answers through a shared anonymous allowance when you have not configured a search key, so search works without a second credential.
 
+### Use a ChatGPT account
+
+This feature is added on this branch and is not included in upstream installers. For an Apple Silicon Mac, follow the [personal DMG installation guide](docs/INSTALL_CHATGPT_MAC_CN.md).
+
+Open **Settings → ChatGPT / Codex**, choose browser or device-code login, and authorize on the OpenAI page. Then add **OpenAI Codex (legacy)** in **Models**, choose an available model, and select it in your conversation. No API key or custom Base URL is needed.
+
+This uses the account's available Codex subscription allowance, subject to OpenAI's model access and limits; it does not convert Plus into API credit. Sign out removes the locally stored grant. See [sign-in and credential details](packages/desktop-electron/resources/dsh/chatgpt/README.md).
+
 ## Download
 
-Download the latest macOS and Windows builds from [GitHub Releases](https://github.com/Astro-Han/pawwork/releases/latest).
+For this branch's ChatGPT-enabled personal build, follow the [installation guide](docs/INSTALL_CHATGPT_MAC_CN.md). The [upstream releases](https://github.com/Astro-Han/pawwork/releases/latest) below do not include this branch's added sign-in feature.
 
 - **macOS:** download the `.dmg`. Release builds are signed and notarized by Apple.
 - **Windows:** download the Windows x64 `.exe`. Windows builds are currently unsigned, so SmartScreen may appear on first launch — choose "More info", then "Run anyway".
@@ -108,7 +116,7 @@ PawWork is a DSH runtime, a native desktop shell, and a product layer on top.
 Requires Node.js 24 and pnpm 11.
 
 ```bash
-git clone https://github.com/Astro-Han/pawwork.git
+git clone --branch codex/chatgpt-login https://github.com/DHLbigmonster/pawwork.git
 cd pawwork
 pnpm install --frozen-lockfile
 pnpm dev:desktop
@@ -140,7 +148,7 @@ PDF, Word (`.docx`), Excel (`.xlsx`), PowerPoint (`.pptx`), CSV, Markdown, plain
 Yes. Automations run a saved task on a cron schedule and write results into your workspace.
 
 **Which model provider should I use?**
-Any provider the DSH model adapter supports. PawWork does not resell model access or take a cut — you hold the key and pay the provider directly.
+Any provider the DSH model adapter supports. PawWork does not resell model access or take a cut. With API keys, you pay the provider directly; this branch also supports your account's available ChatGPT / Codex subscription access.
 
 **What platforms does PawWork support?**
 macOS (Apple Silicon and Intel, signed and notarized) and Windows x64.

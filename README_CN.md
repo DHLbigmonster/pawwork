@@ -81,13 +81,21 @@ Automations 按 cron 计划自动执行已保存的任务——周一早上汇�
 
 ## 模型与搜索
 
-爪印不附带任何模型凭据。首次启动会引导你选择服务商并粘贴 API Key，Key 保存在本地，随时可以在设置里更换。DSH 模型适配器支持的服务商都可以用。
+爪印不附带任何模型凭据。首次启动可选择 ChatGPT 账户授权，或添加服务商的 API Key；授权和 Key 保存在本地，随时可以在设置里更换。DSH 模型适配器支持的服务商都可以用。
 
 联网搜索是内置的：没有配置搜索 Key 时走共享的匿名额度，所以不需要再准备第二个凭据。
 
+### 使用 ChatGPT 账户
+
+这是本分支新增的功能，上游官网安装包不包含此改动。Apple 芯片 Mac 请使用[个人版 DMG 安装说明](docs/INSTALL_CHATGPT_MAC_CN.md)。
+
+在「设置 → ChatGPT / Codex」选择浏览器登录或设备码登录，并在 OpenAI 页面完成授权。然后在「模型」中添加 **OpenAI Codex (legacy)**，选择可用模型，再在对话中切换使用；无需填写 API Key 或自定义 Base URL。
+
+此方式使用账户可用的 Codex 订阅额度，模型和限制由 OpenAI 决定，不会将 Plus 订阅转换为 API 余额。退出登录会删除本机保存的授权。[登录与凭据说明](packages/desktop-electron/resources/dsh/chatgpt/README.md)。
+
 ## 下载
 
-在 [GitHub Releases](https://github.com/Astro-Han/pawwork/releases/latest) 下载最新的 macOS 和 Windows 版本。
+本分支的 ChatGPT 登录个人版请按[安装说明](docs/INSTALL_CHATGPT_MAC_CN.md)下载构建产物。下面链接是[上游正式版](https://github.com/Astro-Han/pawwork/releases/latest)，不包含本分支新增的登录功能。
 
 - **macOS：** 下载 `.dmg`。正式版已由 Apple 签名并公证。
 - **Windows：** 下载 Windows x64 的 `.exe`。当前为未签名安装包，首次打开可能弹出 SmartScreen——点「更多信息」，再点「仍要运行」。
@@ -108,7 +116,7 @@ Automations 按 cron 计划自动执行已保存的任务——周一早上汇�
 需要 Node.js 24 和 pnpm 11。
 
 ```bash
-git clone https://github.com/Astro-Han/pawwork.git
+git clone --branch codex/chatgpt-login https://github.com/DHLbigmonster/pawwork.git
 cd pawwork
 pnpm install --frozen-lockfile
 pnpm dev:desktop
@@ -140,7 +148,7 @@ PDF、Word（`.docx`）、Excel（`.xlsx`）、PowerPoint（`.pptx`）、CSV、M
 可以。Automations 按 cron 计划执行已保存的任务，结果写回你的工作目录。
 
 **该用哪家模型服务商？**
-DSH 模型适配器支持的都可以。爪印不转售模型额度，也不抽成——Key 在你手里，费用直接付给服务商。
+DSH 模型适配器支持的都可以。爪印不转售模型额度，也不抽成。API Key 方式由你直接向服务商付费；本分支也支持使用账户可用的 ChatGPT / Codex 订阅权限。
 
 **支持哪些平台？**
 macOS（Apple 芯片与 Intel，已签名公证）和 Windows x64。

@@ -343,10 +343,11 @@ span:has(> [data-slot="conversation.hero.brand.mark"]) + span > span + span { di
         h("div", { className: "pawwork-onboarding-content" },
           h("h2", { className: "pawwork-onboarding-title" }, title),
           h("div", { className: "pawwork-onboarding-body" },
-            h("p", null, text("爪印不自带模型。在「模型」里添加一个服务商并填入它的 API Key，再到会话输入框的模型按钮里选一个模型。",
-              "PawWork ships no model of its own. Add a provider under Models and enter its API key, then choose one of its models from the model button in the composer.")),
+            h("p", null, text("爪印不自带模型。你可以登录 ChatGPT 账户授权 Codex，或在「模型」里添加 API Key 服务商，然后到会话输入框选择模型。",
+              "PawWork ships no model of its own. Sign in with ChatGPT to authorize Codex, or add an API-key provider under Models, then select a model in the composer.")),
             h("div", { className: "pawwork-onboarding-actions" },
               h(Button, { onClick: complete, variant: "outline" }, text("稍后再说", "Not now")),
+              h(Button, { onClick: () => { openSection("pawwork-chatgpt"); complete() }, variant: "outline" }, text("登录 ChatGPT", "Sign in with ChatGPT")),
               // The step blocks the app root while it is up, and the section it
               // opens renders inside that root. Standing down is what makes the
               // section usable, so it is part of opening it, not a later step.

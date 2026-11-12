@@ -5,12 +5,7 @@ import { dirname, join } from "node:path"
 import { installedHarnessPackages } from "./dsh-product-patch.testing"
 import { pathToFileURL } from "node:url"
 
-/**
- * These assertions guard `patches/@deepseek-ai__dsh-llm-pi-ai@<version>.patch`, which restores the
- * catalog filter DSH 0.1.1-rc.1 dropped. pi-ai's `openai-codex` authenticates only through a
- * ChatGPT OAuth grant, and no DSH release yet ships a surface that can obtain one, so an unfiltered
- * directory offers an API-key form whose key can never work.
- */
+/** The product sign-in surface now serves the OAuth-only Codex route. */
 
 function resolveInDsh(specifier: string) {
   const require = createRequire(import.meta.url)
@@ -73,18 +68,18 @@ async function builtinProviders() {
 }
 
 describe("pi-ai configurable-provider directory", () => {
-  test("hides the catalog provider PawWork cannot authenticate", async () => {
+  test("offers Codex alongside API-key providers", async () => {
     const directory = await configurableProviders()
 
-    expect(directory).not.toContain("openai-codex")
+    expect(directory).toContain("openai-codex")
     expect(directory).toContain("deepseek")
     expect(directory).toContain("opencode")
   })
 
-  test("hides only that provider", async () => {
+  test("offers every built-in provider", async () => {
     const [directory, builtin] = await Promise.all([configurableProviders(), builtinProviders()])
 
-    expect(builtin.filter((provider) => !directory.includes(provider))).toEqual(["openai-codex"])
+    expect(builtin.filter((provider) => !directory.includes(provider))).toEqual([])
   })
 })
 
@@ -113,14 +108,13 @@ function wireNamespaces() {
 }
 
 describe("DSH authorization surface", () => {
-  test("still ships no wire method, so the patch is still the right call", () => {
+  test("does not expose the general authorization service over RPC", () => {
     const namespaces = wireNamespaces()
 
     // Proves the scan reads real tables rather than passing on an empty sweep.
     expect(namespaces.get("credentials")).toBeDefined()
     expect(namespaces.get("llm")).toBeDefined()
-    // When this fails, DSH can start a sign-in: drop the pi-ai patch, mount
-    // @deepseek-ai/dsh-authorization in the product bundle patch, and delete this file.
+    // PawWork exposes only its scoped ChatGPT login service.
     expect(namespaces.get("authorization")).toBeUndefined()
   })
 })

@@ -682,5 +682,13 @@ describe("PawWork DSH client product layer", () => {
     ;(primary.props.onClick as () => void)()
     expect(openSection).toHaveBeenCalledWith("models")
     expect(complete).toHaveBeenCalled()
+    openSection.mockClear()
+    complete.mockClear()
+    const chatgpt = visit(tree).find((element) =>
+      element.type === "Button" && JSON.stringify(element.props.children).includes("登录 ChatGPT"))!
+    expect(chatgpt).toBeDefined()
+    ;(chatgpt.props.onClick as () => void)()
+    expect(openSection).toHaveBeenCalledWith("pawwork-chatgpt")
+    expect(complete).toHaveBeenCalled()
   })
 })
