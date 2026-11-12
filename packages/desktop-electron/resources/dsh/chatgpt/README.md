@@ -1,7 +1,7 @@
 # ChatGPT / Codex sign-in
 
 Open **Settings → ChatGPT / Codex** and choose browser or device-code login.
-Authorize in the OpenAI page, then add **OpenAI Codex (legacy)** in **Models**
+Authorize in the OpenAI page, then add **openai-codex** in **Models**
 and select an available model in the conversation. Leave API key and Base URL
 unset for this route. Existing DeepSeek settings and the default model are
 unchanged. The route uses the subscription's Codex allowance, subject to the

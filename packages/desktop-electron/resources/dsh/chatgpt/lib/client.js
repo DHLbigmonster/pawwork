@@ -84,7 +84,7 @@ window.__ModuleLoader__.load({
             h("input", { type: "password", value: answer, autoComplete: "off", onChange: (event) => setAnswer(event.target.value), style: { width: "100%" } })),
           h(Button, { type: "submit", disabled: busy || !answer.trim() }, text("完成登录", "Complete sign-in"))) : null,
         error || connectionError || state.error ? h("p", { role: "alert" }, error || connectionError || text("ChatGPT 登录失败，请重试或使用设备码登录。", "ChatGPT sign-in failed. Retry or use device code login.")) : null,
-        h("p", null, text("登录后，前往「模型」添加 OpenAI Codex (legacy)，选择其中可用的模型，然后在对话中切换。不要为此提供商填写 API Key 或自定义 Base URL。退出只删除本机授权，不会撤销其他设备的会话。", "After signing in, add OpenAI Codex (legacy) in Models, choose an available model, then select it in your conversation. Leave API key and custom Base URL unset for this provider. Sign out removes this device's stored grant; it does not revoke other sessions.")))
+        h("p", null, text("登录后，前往「模型」添加 openai-codex，选择其中可用的模型，然后在对话中切换。不要为此提供商填写 API Key 或自定义 Base URL。退出只删除本机授权，不会撤销其他设备的会话。", "After signing in, add openai-codex in Models, choose an available model, then select it in your conversation. Leave API key and custom Base URL unset for this provider. Sign out removes this device's stored grant; it does not revoke other sessions.")))
     }
     return {
       inject: ["slots", "connection"],

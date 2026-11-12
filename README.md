@@ -89,7 +89,7 @@ Web search is built in and answers through a shared anonymous allowance when you
 
 This feature is added on this branch and is not included in upstream installers. For an Apple Silicon Mac, follow the [personal DMG installation guide](docs/INSTALL_CHATGPT_MAC_CN.md).
 
-Open **Settings → ChatGPT / Codex**, choose browser or device-code login, and authorize on the OpenAI page. Then add **OpenAI Codex (legacy)** in **Models**, choose an available model, and select it in your conversation. No API key or custom Base URL is needed.
+Open **Settings → ChatGPT / Codex**, choose browser or device-code login, and authorize on the OpenAI page. Then add **openai-codex** in **Models**, choose an available model, and select it in your conversation. No API key or custom Base URL is needed.
 
 This uses the account's available Codex subscription allowance, subject to OpenAI's model access and limits; it does not convert Plus into API credit. Sign out removes the locally stored grant. See [sign-in and credential details](packages/desktop-electron/resources/dsh/chatgpt/README.md).
 

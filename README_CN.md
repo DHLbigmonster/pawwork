@@ -89,7 +89,7 @@ Automations 按 cron 计划自动执行已保存的任务——周一早上汇�
 
 这是本分支新增的功能，上游官网安装包不包含此改动。Apple 芯片 Mac 请使用[个人版 DMG 安装说明](docs/INSTALL_CHATGPT_MAC_CN.md)。
 
-在「设置 → ChatGPT / Codex」选择浏览器登录或设备码登录，并在 OpenAI 页面完成授权。然后在「模型」中添加 **OpenAI Codex (legacy)**，选择可用模型，再在对话中切换使用；无需填写 API Key 或自定义 Base URL。
+在「设置 → ChatGPT / Codex」选择浏览器登录或设备码登录，并在 OpenAI 页面完成授权。然后在「模型」中添加 **openai-codex**，选择可用模型，再在对话中切换使用；无需填写 API Key 或自定义 Base URL。
 
 此方式使用账户可用的 Codex 订阅额度，模型和限制由 OpenAI 决定，不会将 Plus 订阅转换为 API 余额。退出登录会删除本机保存的授权。[登录与凭据说明](packages/desktop-electron/resources/dsh/chatgpt/README.md)。
 
