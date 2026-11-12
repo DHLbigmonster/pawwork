@@ -1,6 +1,8 @@
 // The installed pi-ai adapter owns PKCE, callbacks, refresh and inference.
 // This surface only bridges its authorization conversation; grants never leave
 // the existing DSH credential service.
+import { loginFailureCode } from "./failure.js"
+
 export function createChatGptEngine({ authorization, credentials, key }) {
   let active
   let signingOut
@@ -75,9 +77,9 @@ export function createChatGptEngine({ authorization, credentials, key }) {
       },
     }).then((result) => {
       state = { phase: result.status }
-    }).catch(() => {
+    }).catch((error) => {
       // OAuth errors can contain token responses. Do not send them to clients.
-      state = { phase: "failed", error: "ChatGPT sign-in failed. Retry or use device code login." }
+      state = { phase: "failed", error: "ChatGPT sign-in failed. Retry or use device code login.", errorCode: loginFailureCode(error) }
     }).finally(() => {
       clearTimeout(timer)
       attempt.answer?.(undefined)
