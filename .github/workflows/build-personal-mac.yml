@@ -11,7 +11,7 @@ permissions:
 
 concurrency:
   group: personal-mac-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   mac-arm64:
@@ -74,6 +74,12 @@ jobs:
         run: |
           set -euo pipefail
           shasum -a 256 *.dmg *.zip > SHA256SUMS.txt
+
+      - name: Smoke test the packaged Mac application
+        working-directory: packages/desktop-electron
+        env:
+          PAWWORK_CI_SMOKE_CDP: "true"
+        run: pnpm exec tsx scripts/ci-smoke.ts packaged dev
 
       - name: Upload personal installer
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.0
